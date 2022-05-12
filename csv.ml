@@ -20,19 +20,12 @@ let load file_name =
   | _ -> raise (Failure "could not read file")
 ;;
 
-let rec fprint_list oc liste =
-  match liste with
-  | x::[] -> Printf.fprintf oc "%s" x
-  | x::rem -> Printf.fprintf oc "%s\",\"" x; fprint_list oc rem
-  | [] -> ()
-;;
-
 let print_table oc table =
-  Printf.fprintf oc "\"%a\"\n" fprint_list table.header;
+  Printf.fprintf oc "\"%s\"\n" (String.concat "\",\"" table.header);
   let rec print_body body = (
     match body with
-    | l::[] -> Printf.fprintf oc "\"%a\"" fprint_list l
-    | l::rem -> Printf.fprintf oc "\"%a\"\n" fprint_list l; print_body rem
+    | l::[] -> Printf.fprintf oc "\"%s\"" (String.concat "\",\"" l)
+    | l::rem -> Printf.fprintf oc "\"%s\"\n" (String.concat "\",\"" l); print_body rem
     | [] -> ()
   ) in
   print_body table.body;

@@ -62,17 +62,23 @@ let newline = ('\010' | '\013' | "\013\010")
 rule lex = parse
     (' ' | '\t' | newline)
       { lex lexbuf }
-  | [ 'A'-'Z' 'a'-'z' ] [ 'A'-'Z' 'a'-'z']* as lxm
+  | [ 'A'-'Z' 'a'-'z' ] [ 'A'-'Z' 'a'-'z' '1'-'9']* as lxm
     {match lxm with
       | "OPEN" -> OPEN
       | "COMMIT" -> COMMIT
       | "AS" -> AS
       | "TO" -> TO
+      | "SELECT" -> SELECT
+      | "LET" -> LET
+      | "FROM" -> FROM
       | _ -> IDENT(lxm) }
   | ";"  {SEMI}
   | '"'   { reset_string_buffer();
             in_string lexbuf;
             STRING (get_stored_string()) }
+  | "(" {LPAR}
+  | ")" {RPAR}
+  | "=" {EQUAL}
   | eof {raise Eoi}
   | _  as c { Printf.eprintf "Invalid char `%c'\n%!" c ; lex lexbuf }
 

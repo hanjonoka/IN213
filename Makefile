@@ -9,7 +9,7 @@ COMPFLAGS=
 
 BUILD_FOLDER = build/
 EXEC= dbl
-SRCS = csv.ml dblast.ml dblsem.ml dblloop.ml
+SRCS = utils.ml csv.ml dblast.ml dblsem.ml dblloop.ml
 GENERATED = dblparse.ml dbllex.ml
 OBJS = $(GENERATED:.ml=.cmo) $(SRCS:.ml=.cmo)
 
