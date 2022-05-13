@@ -1,6 +1,5 @@
 %{
 open Dblast ;;
-open Utils;;
 %}
 
 %token <string> IDENT
@@ -34,8 +33,8 @@ expr :
 
 not_void_expr :
 | SELECT IDENT seqident FROM IDENT { ESelect($2::$3, $5) }
-| LCURL LBRAC IDENT seqident RBRAC LBRAC value seqvalue RBRAC RCURL                       {ETable($3::$4, [$7::$8])}
-| LCURL LBRAC IDENT seqident RBRAC LBRAC LBRAC value seqvalue RBRAC row_vals RBRAC RCURL  {ETable($3::$4, ($8::$9)::$11)}
+| LCURL LBRAC IDENT seqident RBRAC LBRAC IDENT seqident RBRAC LBRAC value seqvalue RBRAC RCURL                       {ETable($3::$4, $7::$8, [$11::$12])}
+| LCURL LBRAC IDENT seqident RBRAC LBRAC IDENT seqident RBRAC LBRAC LBRAC value seqvalue RBRAC row_vals RBRAC RCURL  {ETable($3::$4, $7::$8, ($12::$13)::$15)}
 | atom                             { $1 }
 | LPAR not_void_expr RPAR {$2}
 ;

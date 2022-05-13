@@ -26,10 +26,7 @@ let lookup var_name rho =
   with Not_found -> error (Printf.sprintf "Undefined ident '%s'" var_name)
 
 let rec printval = function
-  | Tableval tb -> 
-    let print_row row =
-      Printf.sprintf "[%s]" (String.concat ";" (List.map raw_of_val row)) in
-    Printf.fprintf stdout "Table : \n[%s]\n%s" (String.concat ";" tb.header) (String.concat "\n" (List.map print_row tb.body))
+  | Tableval tb -> Csv.print_table stdout tb
   | Void -> Printf.printf ""
 ;;
 
@@ -38,15 +35,15 @@ let rec printval = function
 let rec eval e rho =
   match e with
   | EOpen (f, i) -> (
-    let (header, body) = Csv.load f in
-    let table = Tableval (get_table header body) in
+    let (header, types, body) = Csv.load f in
+    let table = Tableval (get_table header types body) in
     extend_global_env i table;
     Void
   )
   | ECommit (i, f) -> (
     let table = lookup i rho in
     match table with
-    | Tableval tb -> (Csv.write f {header=tb.header; body=tb.body}; Void)
+    | Tableval tb -> (Csv.write f (get_table tb.header (List.map raw_of_type tb.types) tb.body); Void)
     | _ -> error ("cannot commit non table")
   )
   | EIdent v -> lookup v rho
@@ -66,7 +63,11 @@ let rec eval e rho =
       in
       let header = (list_filteri find_ind cols) in
       let find_inds row = List.map (List.nth row) l_ind.l in
-      Tableval (get_table header (List.map (find_inds) tb.body))
+      let find_inds_type_to_raw ty = (
+        let nth_to_raw l i = raw_of_type (List.nth l i) in
+        List.map (nth_to_raw ty) l_ind.l
+      ) in
+      Tableval (get_table header (find_inds_type_to_raw tb.types) (List.map (find_inds) tb.body))
     )
     | _ -> error ("Can only select from a table")
   )
@@ -76,8 +77,8 @@ let rec eval e rho =
     | Tableval tb -> (extend_global_env str value ; Void)
     | _ -> error ("error in let")
     )
-  | ETable (header, body) -> (
-    Tableval (get_table header body)
+  | ETable (header, types, body) -> (
+    Tableval (get_table header types body)
   )
   | EInsert (tb1_expr, tb2_i) -> (
     match eval tb1_expr rho with

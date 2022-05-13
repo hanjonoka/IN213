@@ -2,7 +2,7 @@ type value =
   | Int of int
   | Str of string
 
-type table = { mutable header: string list; mutable body: value list list }
+type table = { mutable header: string list; mutable types: value list; mutable body: value list list }
 
 type mutable_int_list = {mutable l: int list}
 
@@ -38,7 +38,7 @@ let sprint_val v =
   | Int i -> Printf.sprintf "%d" i
 
 let val_of_raw raw_val =
-  if raw_val.[0] == '"' && raw_val.[(String.length raw_val) - 1] == '\"'
+  if raw_val.[0] == '"' && raw_val.[(String.length raw_val) - 1] == '"'
     then Str (String.sub raw_val 1 ((String.length raw_val)-2))
   else
     try
@@ -46,9 +46,34 @@ let val_of_raw raw_val =
     with
     | Failure "int_of_string" -> error "could not parse raw val"
 
-let get_table header body =
+let type_of_raw str =
+  match str with
+  | "Str" -> Str " "
+  | "Int" -> Int 0
+  | s -> error (Printf.sprintf "unknown type %s" s)
+
+let raw_of_type t =
+  match t with
+  | Int _ -> "Int"
+  | Str _ -> "Str"
+
+let get_table header types body =
   let is_of_wrong_size row = (List.length row != List.length header) in
-  if List.exists is_of_wrong_size body then error ("Wrong format");
-  {header= header; body= body}
+
+  if is_of_wrong_size types then error ("Wrong format : number of types is not the same as number of cols");
+  let types_l = List.map type_of_raw types in
+
+  let is_wrongly_typed row = (
+    let is_of_wrong_type v t = (
+      match (v,t) with
+      | Int i, Int _ -> false
+      | Str s, Str _ -> false
+      | _ -> error "incorrect type"; true
+    ) in
+    List.exists2 is_of_wrong_type row types_l
+  ) in
+
+  if (List.exists is_of_wrong_size body) || (List.exists is_wrongly_typed body) then error ("Wrong format : number of values is not the same as number of cols");
+  {header= header; types= types_l; body= body}
 ;;
 
