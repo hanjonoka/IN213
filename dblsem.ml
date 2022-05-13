@@ -83,7 +83,12 @@ let rec eval e rho =
     match eval tb1_expr rho with
     | Tableval tb1 -> (
       match lookup tb2_i rho with
-      | Tableval tb2 -> tb2.body <- List.append tb2.body tb1.body; Void
+      | Tableval tb2 -> (
+        if list_are_equals tb1.header tb2.header
+          then tb2.body <- List.append tb2.body tb1.body
+        else error "Tables structure must be identical"
+        ; Void
+      )
       | _ -> error "Cannot insert into non-table"
     )
     | _ -> error "Cannot insert non-table"

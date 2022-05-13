@@ -14,20 +14,6 @@ let load file_name =
     let body_string = List.map (String.split_on_char ',') body_lines in
     let body = List.map (List.map val_of_raw) body_string in
     (header, body)
-
-    (* let extract_val str = val_of_raw (extract_raw str) in
-    (* Printf.printf "%s\n" header_line; *)
-    let nb_cols = List.length header_list in
-    let tb = {header= (List.map extract_raw header_list); body= []} in
-    try
-      while true do
-        let new_line_list = String.split_on_char ',' (input_line ic) in
-        if List.length new_line_list != nb_cols then (raise (Failure "Wrong format"));
-        tb.body <- ((List.map extract_val new_line_list) :: tb.body)
-      done;
-      tb
-    with
-    | End_of_file -> tb *)
   with
   | _ -> raise (Failure "could not read file")
 ;;

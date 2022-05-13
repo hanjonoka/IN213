@@ -1,4 +1,3 @@
-(* Existe dans le module List seulement à partir de Ocaml 4.11 et j'ai Ocaml 4.08 *)
 type value =
   | Int of int
   | Str of string
@@ -9,6 +8,7 @@ type mutable_int_list = {mutable l: int list}
 
 let error msg = raise (Failure msg) ;;
 
+(* Existe dans le module List seulement à partir de Ocaml 4.11 et j'ai Ocaml 4.08 *)
 let rec list_filteri f l i =
   match l with
   | x::rem -> (
@@ -18,6 +18,14 @@ let rec list_filteri f l i =
   | [] -> []
 ;;
 let list_filteri f l = list_filteri f l 0;;
+
+(* Existe dans le module List seulement à partir de Ocaml 4.12 et j'ai Ocaml 4.08 *)
+let list_are_equals l1 l2 =
+  try
+    let eq a b = a = b in
+    List.for_all2 eq l1 l2
+  with
+  | _ -> false
 
 let raw_of_val v =
   match v with
@@ -31,7 +39,7 @@ let sprint_val v =
 
 let val_of_raw raw_val =
   if raw_val.[0] == '"' && raw_val.[(String.length raw_val) - 1] == '\"'
-    then Str (String.sub raw_val 1 ((String.length raw_val)-1))
+    then Str (String.sub raw_val 1 ((String.length raw_val)-2))
   else
     try
       Int (int_of_string raw_val)
