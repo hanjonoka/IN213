@@ -38,8 +38,8 @@ let rec printval = function
 let rec eval e rho =
   match e with
   | EOpen (f, i) -> (
-    let csv_table = Csv.load f in
-    let table = Tableval (get_table csv_table.header csv_table.body) in
+    let (header, body) = Csv.load f in
+    let table = Tableval (get_table header body) in
     extend_global_env i table;
     Void
   )

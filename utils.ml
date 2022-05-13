@@ -1,7 +1,7 @@
 (* Existe dans le module List seulement à partir de Ocaml 4.11 et j'ai Ocaml 4.08 *)
 type value =
   | Int of int
-  | String of string
+  | Str of string
 
 type table = { mutable header: string list; mutable body: value list list }
 
@@ -21,19 +21,22 @@ let list_filteri f l = list_filteri f l 0;;
 
 let raw_of_val v =
   match v with
-  | String s -> "\"" ^ s ^ "\""
+  | Str s -> "\"" ^ s ^ "\""
   | Int i -> Printf.sprintf "%d" i
 
 let sprint_val v =
   match v with
-  | String s -> "\"" ^ s ^ "\""
+  | Str s -> "\"" ^ s ^ "\""
   | Int i -> Printf.sprintf "%d" i
 
 let val_of_raw raw_val =
-  try
-    Int (int_of_string raw_val)
-  with
-  | Failure "int_of_string" -> String raw_val
+  if raw_val.[0] == '"' && raw_val.[(String.length raw_val) - 1] == '\"'
+    then Str (String.sub raw_val 1 ((String.length raw_val)-1))
+  else
+    try
+      Int (int_of_string raw_val)
+    with
+    | Failure "int_of_string" -> error "could not parse raw val"
 
 let get_table header body =
   let is_of_wrong_size row = (List.length row != List.length header) in

@@ -316,7 +316,7 @@ let yyact = [|
     let _1 = (Parsing.peek_val __caml_parser_env 0 : string) in
     Obj.repr(
 # 54 "dblparse.mly"
-          ( String _1 )
+          ( Str _1 )
 # 321 "dblparse.ml"
                : Utils.value))
 ; (fun __caml_parser_env ->

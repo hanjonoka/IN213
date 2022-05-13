@@ -51,7 +51,7 @@ seqident:
 
 value:
   INT     { Int $1 }
-| STRING  { String $1 }
+| STRING  { Str $1 }
 
 seqvalue:
   value seqvalue  { $1 :: $2 }
