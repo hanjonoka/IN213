@@ -71,13 +71,20 @@ rule lex = parse
       | "SELECT" -> SELECT
       | "LET" -> LET
       | "FROM" -> FROM
+      | "INSERT" -> INSERT
+      | "INTO" -> INTO
       | _ -> IDENT(lxm) }
   | ";"  {SEMI}
   | '"'   { reset_string_buffer();
             in_string lexbuf;
             STRING (get_stored_string()) }
+  | [ '0'-'9' ] [ '0'-'9' ]* as lxm {INT(int_of_string lxm)}
   | "(" {LPAR}
   | ")" {RPAR}
+  | "{" {LCURL}
+  | "}" {RCURL}
+  | "[" {LBRAC}
+  | "]" {RBRAC}
   | "=" {EQUAL}
   | eof {raise Eoi}
   | _  as c { Printf.eprintf "Invalid char `%c'\n%!" c ; lex lexbuf }

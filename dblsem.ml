@@ -2,7 +2,7 @@ open Dblast;;
 open Utils;;
 
 type dblval =
-  | Tableval of { mutable header: string list; mutable body: string list list }
+  | Tableval of table
   | Void
 
 and environment = (string * dblval) list
@@ -11,8 +11,6 @@ and global_environnement = {mutable env: environment}
 ;;
 
 let init_env = [];;
-
-let error msg = raise (Failure msg) ;;
 
 let global_env = {env= init_env};;
 
@@ -30,7 +28,7 @@ let lookup var_name rho =
 let rec printval = function
   | Tableval tb -> 
     let print_row row =
-      Printf.sprintf "[%s]" (String.concat ";" row) in
+      Printf.sprintf "[%s]" (String.concat ";" (List.map raw_of_val row)) in
     Printf.fprintf stdout "Table : \n[%s]\n%s" (String.concat ";" tb.header) (String.concat "\n" (List.map print_row tb.body))
   | Void -> Printf.printf ""
 ;;
@@ -40,8 +38,8 @@ let rec printval = function
 let rec eval e rho =
   match e with
   | EOpen (f, i) -> (
-    let record_table = Csv.load f in
-    let table = Tableval {header= record_table.header;body= record_table.body} in
+    let csv_table = Csv.load f in
+    let table = Tableval (get_table csv_table.header csv_table.body) in
     extend_global_env i table;
     Void
   )
@@ -68,17 +66,28 @@ let rec eval e rho =
       in
       let header = (list_filteri find_ind cols) in
       let find_inds row = List.map (List.nth row) l_ind.l in
-      Tableval {header=header; body=(
-        List.map (find_inds) tb.body
-      )}
+      Tableval (get_table header (List.map (find_inds) tb.body))
     )
     | _ -> error ("Can only select from a table")
   )
-  | ELet (str, e) ->
+  | ELet (str, e) -> (
     let value = eval e rho in
     match value with
     | Tableval tb -> (extend_global_env str value ; Void)
     | _ -> error ("error in let")
+    )
+  | ETable (header, body) -> (
+    Tableval (get_table header body)
+  )
+  | EInsert (tb1_expr, tb2_i) -> (
+    match eval tb1_expr rho with
+    | Tableval tb1 -> (
+      match lookup tb2_i rho with
+      | Tableval tb2 -> tb2.body <- List.append tb2.body tb1.body; Void
+      | _ -> error "Cannot insert into non-table"
+    )
+    | _ -> error "Cannot insert non-table"
+  )
   | _ -> raise (Failure "à finir")
 ;;
 

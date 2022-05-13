@@ -9,9 +9,10 @@ COMPFLAGS=
 
 BUILD_FOLDER = build/
 EXEC= dbl
-SRCS = utils.ml csv.ml dblast.ml dblsem.ml dblloop.ml
+UTILS = utils.ml
+SRCS = csv.ml dblast.ml dblsem.ml dblloop.ml
 GENERATED = dblparse.ml dbllex.ml
-OBJS = $(GENERATED:.ml=.cmo) $(SRCS:.ml=.cmo)
+OBJS = $(UTILS:.ml=.cmo) $(GENERATED:.ml=.cmo) $(SRCS:.ml=.cmo)
 
 all: $(EXEC)
 
@@ -43,7 +44,7 @@ clean:
 	rm -f $(GENERATED)
 
 # Dependencies
-depend: $(GENERATED) $(SRCS)
-	$(CAMLDEP) $(GENERATED) $(SRCS) > .depend
+depend: $(UTILS) $(GENERATED) $(SRCS)
+	$(CAMLDEP) $(UTILS) $(GENERATED) $(SRCS) > .depend
 
 include .depend
