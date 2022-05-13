@@ -85,7 +85,7 @@ let rec eval e rho =
     | Tableval tb1 -> (
       match lookup tb2_i rho with
       | Tableval tb2 -> (
-        if list_are_equals tb1.header tb2.header
+        if list_are_equals tb1.header tb2.header && list_are_equals tb1.types tb2.types
           then tb2.body <- List.append tb2.body tb1.body
         else error "Tables structure must be identical"
         ; Void
