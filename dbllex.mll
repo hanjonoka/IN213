@@ -73,6 +73,8 @@ rule lex = parse
       | "FROM" -> FROM
       | "INSERT" -> INSERT
       | "INTO" -> INTO
+      | "AND" -> AND
+      | "WHERE" -> WHERE
       | _ -> IDENT(lxm) }
   | ";"  {SEMI}
   | '"'   { reset_string_buffer();

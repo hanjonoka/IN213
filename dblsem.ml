@@ -47,27 +47,34 @@ let rec eval e rho =
     | _ -> error ("cannot commit non table")
   )
   | EIdent v -> lookup v rho
-  | ESelect (cols, table_name) -> (
-    let l_ind = {l=[]} in
+  | ESelect (cols, table_name, where) -> (
     let table = lookup table_name rho in
     match table with
     | Tableval tb -> (
-      let eq a b = (a=b) in
-      let find_ind ind col =
-        if (List.exists (eq col) tb.header) 
-        then (
-          l_ind.l <- ind :: l_ind.l;
-          true
-        )
-        else false
-      in
-      let header = (list_filteri find_ind cols) in
-      let find_inds row = List.map (List.nth row) l_ind.l in
+      let indices = List.map (list_find_i tb.header) cols in
+      let header = List.map (List.nth tb.header) indices in
+      let find_inds row = List.map (List.nth row) indices in
       let find_inds_type_to_raw ty = (
         let nth_to_raw l i = raw_of_type (List.nth l i) in
-        List.map (nth_to_raw ty) l_ind.l
+        List.map (nth_to_raw ty) indices
       ) in
-      Tableval (get_table header (find_inds_type_to_raw tb.types) (List.map (find_inds) tb.body))
+      let rec compute_filter where head =
+        match where with
+        | (s,v)::rem -> (
+          ((list_find_i head s),v) :: (compute_filter rem head)
+        )
+        | _ -> []
+      in
+      let filter = compute_filter where tb.header in
+      let rec apply_where filter row = (
+        match filter with
+        | (i, v) :: rem -> (
+          if (List.nth row i)=v then (true && (apply_where rem row)) else false
+        )
+        | _ -> true
+      )
+      in
+      Tableval (get_table header (find_inds_type_to_raw tb.types) (List.map (find_inds) (List.filter (apply_where filter) tb.body)))
     )
     | _ -> error ("Can only select from a table")
   )

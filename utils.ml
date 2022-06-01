@@ -1,6 +1,7 @@
 type value =
   | Int of int
   | Str of string
+  | Null
 
 type table = { mutable header: string list; mutable types: value list; mutable body: value list list }
 
@@ -27,6 +28,14 @@ let list_are_equals l1 l2 =
   with
   | _ -> false
 
+let list_find_i l x =
+  let rec find l x n =
+    match l with
+    | a::rem -> if a=x then n else find rem x (n+1)
+    | _ -> raise (Failure "index not in list")
+  in
+  find l x 0;;
+
 let raw_of_val v =
   match v with
   | Str s -> "\"" ^ s ^ "\""
@@ -36,6 +45,7 @@ let sprint_val v =
   match v with
   | Str s -> "\"" ^ s ^ "\""
   | Int i -> Printf.sprintf "%d" i
+  | Null -> "null"
 
 let val_of_raw raw_val =
   if raw_val.[0] == '"' && raw_val.[(String.length raw_val) - 1] == '"'
@@ -44,7 +54,7 @@ let val_of_raw raw_val =
     try
       Int (int_of_string raw_val)
     with
-    | Failure "int_of_string" -> error "could not parse raw val"
+    | Failure "int_of_string" -> Null
 
 let type_of_raw str =
   match str with
@@ -56,6 +66,7 @@ let raw_of_type t =
   match t with
   | Int _ -> "Int"
   | Str _ -> "Str"
+  | Null -> "null"
 
 let get_table header types body =
   let is_of_wrong_size row = (List.length row != List.length header) in
@@ -66,6 +77,7 @@ let get_table header types body =
   let is_wrongly_typed row = (
     let is_of_wrong_type v t = (
       match (v,t) with
+      | Null, _ -> false
       | Int i, Int _ -> false
       | Str s, Str _ -> false
       | _ -> error "incorrect type"; true
@@ -76,4 +88,5 @@ let get_table header types body =
   if (List.exists is_of_wrong_size body) || (List.exists is_wrongly_typed body) then error ("Wrong format : number of values is not the same as number of cols");
   {header= header; types= types_l; body= body}
 ;;
+
 

@@ -1,4 +1,4 @@
-"c1","c2"
-Int,Str
-1,"slt"
-2,"zef"
+"c1","c2","c3"
+Int,Str,Int
+1,"slt",4
+2,"zef",5

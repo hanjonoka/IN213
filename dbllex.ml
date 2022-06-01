@@ -247,80 +247,82 @@ let
       | "FROM" -> FROM
       | "INSERT" -> INSERT
       | "INTO" -> INTO
+      | "AND" -> AND
+      | "WHERE" -> WHERE
       | _ -> IDENT(lxm) )
-# 252 "dbllex.ml"
+# 254 "dbllex.ml"
 
   | 2 ->
-# 77 "dbllex.mll"
+# 79 "dbllex.mll"
          (SEMI)
-# 257 "dbllex.ml"
+# 259 "dbllex.ml"
 
   | 3 ->
-# 78 "dbllex.mll"
+# 80 "dbllex.mll"
           ( reset_string_buffer();
             in_string lexbuf;
             STRING (get_stored_string()) )
-# 264 "dbllex.ml"
+# 266 "dbllex.ml"
 
   | 4 ->
 let
-# 81 "dbllex.mll"
+# 83 "dbllex.mll"
                                 lxm
-# 270 "dbllex.ml"
+# 272 "dbllex.ml"
 = Lexing.sub_lexeme lexbuf lexbuf.Lexing.lex_start_pos lexbuf.Lexing.lex_curr_pos in
-# 81 "dbllex.mll"
+# 83 "dbllex.mll"
                                     (INT(int_of_string lxm))
-# 274 "dbllex.ml"
+# 276 "dbllex.ml"
 
   | 5 ->
-# 82 "dbllex.mll"
+# 84 "dbllex.mll"
         (LPAR)
-# 279 "dbllex.ml"
+# 281 "dbllex.ml"
 
   | 6 ->
-# 83 "dbllex.mll"
+# 85 "dbllex.mll"
         (RPAR)
-# 284 "dbllex.ml"
+# 286 "dbllex.ml"
 
   | 7 ->
-# 84 "dbllex.mll"
+# 86 "dbllex.mll"
         (LCURL)
-# 289 "dbllex.ml"
+# 291 "dbllex.ml"
 
   | 8 ->
-# 85 "dbllex.mll"
+# 87 "dbllex.mll"
         (RCURL)
-# 294 "dbllex.ml"
+# 296 "dbllex.ml"
 
   | 9 ->
-# 86 "dbllex.mll"
+# 88 "dbllex.mll"
         (LBRAC)
-# 299 "dbllex.ml"
+# 301 "dbllex.ml"
 
   | 10 ->
-# 87 "dbllex.mll"
+# 89 "dbllex.mll"
         (RBRAC)
-# 304 "dbllex.ml"
+# 306 "dbllex.ml"
 
   | 11 ->
-# 88 "dbllex.mll"
+# 90 "dbllex.mll"
         (EQUAL)
-# 309 "dbllex.ml"
+# 311 "dbllex.ml"
 
   | 12 ->
-# 89 "dbllex.mll"
+# 91 "dbllex.mll"
         (raise Eoi)
-# 314 "dbllex.ml"
+# 316 "dbllex.ml"
 
   | 13 ->
 let
-# 90 "dbllex.mll"
+# 92 "dbllex.mll"
           c
-# 320 "dbllex.ml"
+# 322 "dbllex.ml"
 = Lexing.sub_lexeme_char lexbuf lexbuf.Lexing.lex_start_pos in
-# 90 "dbllex.mll"
+# 92 "dbllex.mll"
             ( Printf.eprintf "Invalid char `%c'\n%!" c ; lex lexbuf )
-# 324 "dbllex.ml"
+# 326 "dbllex.ml"
 
   | __ocaml_lex_state -> lexbuf.Lexing.refill_buff lexbuf;
       __ocaml_lex_lex_rec lexbuf __ocaml_lex_state
@@ -330,66 +332,66 @@ and in_string lexbuf =
 and __ocaml_lex_in_string_rec lexbuf __ocaml_lex_state =
   match Lexing.engine __ocaml_lex_tables __ocaml_lex_state lexbuf with
       | 0 ->
-# 94 "dbllex.mll"
+# 96 "dbllex.mll"
       ( () )
-# 336 "dbllex.ml"
+# 338 "dbllex.ml"
 
   | 1 ->
-# 96 "dbllex.mll"
+# 98 "dbllex.mll"
       ( store_string_char(char_for_backslash(Lexing.lexeme_char lexbuf 1));
         in_string lexbuf )
-# 342 "dbllex.ml"
+# 344 "dbllex.ml"
 
   | 2 ->
-# 99 "dbllex.mll"
+# 101 "dbllex.mll"
       ( store_string_char(char_for_decimal_code lexbuf 1);
         in_string lexbuf )
-# 348 "dbllex.ml"
+# 350 "dbllex.ml"
 
   | 3 ->
-# 102 "dbllex.mll"
+# 104 "dbllex.mll"
       ( store_string_char(char_for_hexadecimal_code lexbuf 2);
          in_string lexbuf )
-# 354 "dbllex.ml"
+# 356 "dbllex.ml"
 
   | 4 ->
 let
-# 104 "dbllex.mll"
+# 106 "dbllex.mll"
               chars
-# 360 "dbllex.ml"
+# 362 "dbllex.ml"
 = Lexing.sub_lexeme lexbuf lexbuf.Lexing.lex_start_pos (lexbuf.Lexing.lex_start_pos + 2) in
-# 105 "dbllex.mll"
+# 107 "dbllex.mll"
       ( skip_to_eol lexbuf; raise (Failure("Illegal escape: " ^ chars)) )
-# 364 "dbllex.ml"
+# 366 "dbllex.ml"
 
   | 5 ->
 let
-# 106 "dbllex.mll"
+# 108 "dbllex.mll"
                s
-# 370 "dbllex.ml"
+# 372 "dbllex.ml"
 = Lexing.sub_lexeme lexbuf lexbuf.Lexing.lex_start_pos lexbuf.Lexing.lex_curr_pos in
-# 107 "dbllex.mll"
+# 109 "dbllex.mll"
       ( for i = 0 to String.length s - 1 do
           store_string_char s.[i];
         done;
         in_string lexbuf
       )
-# 378 "dbllex.ml"
+# 380 "dbllex.ml"
 
   | 6 ->
-# 113 "dbllex.mll"
+# 115 "dbllex.mll"
       ( raise Eoi )
-# 383 "dbllex.ml"
+# 385 "dbllex.ml"
 
   | 7 ->
 let
-# 114 "dbllex.mll"
+# 116 "dbllex.mll"
          c
-# 389 "dbllex.ml"
+# 391 "dbllex.ml"
 = Lexing.sub_lexeme_char lexbuf lexbuf.Lexing.lex_start_pos in
-# 115 "dbllex.mll"
+# 117 "dbllex.mll"
       ( store_string_char c; in_string lexbuf )
-# 393 "dbllex.ml"
+# 395 "dbllex.ml"
 
   | __ocaml_lex_state -> lexbuf.Lexing.refill_buff lexbuf;
       __ocaml_lex_in_string_rec lexbuf __ocaml_lex_state
@@ -399,14 +401,14 @@ and skip_to_eol lexbuf =
 and __ocaml_lex_skip_to_eol_rec lexbuf __ocaml_lex_state =
   match Lexing.engine __ocaml_lex_tables __ocaml_lex_state lexbuf with
       | 0 ->
-# 118 "dbllex.mll"
+# 120 "dbllex.mll"
             ( () )
-# 405 "dbllex.ml"
+# 407 "dbllex.ml"
 
   | 1 ->
-# 119 "dbllex.mll"
+# 121 "dbllex.mll"
             ( skip_to_eol lexbuf )
-# 410 "dbllex.ml"
+# 412 "dbllex.ml"
 
   | __ocaml_lex_state -> lexbuf.Lexing.refill_buff lexbuf;
       __ocaml_lex_skip_to_eol_rec lexbuf __ocaml_lex_state
