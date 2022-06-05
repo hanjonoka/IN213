@@ -41,7 +41,7 @@ not_void_expr :
 
 where :
   WHERE IDENT EQUAL value seqfilter {($2,$4)::$5}
-| /* rien */   {[]}
+|                                   {[]}
 seqfilter :
   AND IDENT EQUAL value seqfilter {($2,$4)::$5}
 |                                 {[]}
