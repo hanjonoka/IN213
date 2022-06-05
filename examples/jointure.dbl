@@ -1,0 +1,4 @@
+OPEN "eleves.csv" AS eleves;
+OPEN "notes.csv" AS notes;
+SELECT * FROM notes AS n PROD eleves AS e WHERE n.eleve=e.Id;
+SELECT e.Prenom n.matiere n.note FROM notes AS n PROD eleves AS e WHERE n.eleve=e.Id AND ((n.matiere="physique" AND n.note>10) OR (n.matiere="math" AND n.note>10));

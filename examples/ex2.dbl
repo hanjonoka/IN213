@@ -1,0 +1,7 @@
+LET tb1 = {[col1 col2 col3] [Str Int Int] [["bonjour" 12 13]["au revoir" 5 6]]};
+SELECT * FROM tb1;
+LET tb2 = {[col1][Str]["coucou"]};
+SELECT * FROM tb2;
+SELECT col1 FROM tb1 WHERE col2>5;
+INSERT (SELECT col1 FROM tb1 WHERE col2>5) INTO tb2;
+SELECT * FROM tb2;

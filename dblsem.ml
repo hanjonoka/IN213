@@ -68,7 +68,7 @@ let rec eval e rho =
         | Filtreval f -> f
         | _ -> error "cannot apply not filter"
       in
-      Tableval (get_table header (find_inds_type_to_raw tb.types) (List.map (find_inds) (List.filter (apply_filter filtre header) tb.body)))
+      Tableval (get_table header (find_inds_type_to_raw tb.types) (List.map (find_inds) (List.filter (apply_filter filtre tb.header) tb.body)))
     )
     | _ -> error ("Can only select from a table")
   )

@@ -1,0 +1,5 @@
+OPEN "table1.csv" AS tb1;
+SELECT * FROM tb1;
+INSERT {[col1 col2 col3] [Str Int Int] [["bonjour" 12 13]["au revoir" 5 6]]} INTO tb1;
+SELECT * FROM tb1 WHERE col2=col3;
+COMMIT tb1 TO "tb1_.csv";

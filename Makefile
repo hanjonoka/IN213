@@ -7,8 +7,8 @@ CAMLYACC=$(BINDIR)ocamlyacc
 #COMPFLAGS=-w A-4-6-9 -warn-error A -g
 COMPFLAGS=
 
-BUILD_FOLDER = build/
-EXEC= dbl
+
+EXEC = dbl
 UTILS = utils.ml filter.ml
 SRCS = csv.ml dblast.ml dblsem.ml dblloop.ml
 GENERATED = dblparse.ml dbllex.ml
@@ -40,7 +40,6 @@ clean:
 	rm -f *.cm[io] .cmx
 	rm -f dblparse.mli
 	rm -f $(OBJS)
-	rm -f $(EXEC)
 	rm -f $(GENERATED)
 
 # Dependencies

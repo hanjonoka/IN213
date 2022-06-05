@@ -1,0 +1,17 @@
+Pour compiler - je ne sais pas pourquoi le makefile ne marche pas correctement - il faut executer deux fois la commande make.
+
+Le langage est un langage de base de donnée.
+Les bases de données sont des fichiers .csv dont la première ligne définit le nom des colonne et la deuxième ligne définit les types des colones
+
+Les commandes du langage sont :
+-OPEN filename AS tablename; -> Charge le fichier filename dans la variable tablename.
+-COMMIT tablename [TO filename]; -> Ecrit la table tablename dans le fichier filename. Si la clause "TO filename" n'est pas donné, la table sera écrite dans le fichier tablename.csv
+-SELECT col_names FROM table WHERE filter; -> Selectionne les colonnes col_names de la table avec une close WHERE. col_names peut être "*" ce qui sélectionne toutes les colonnes.
+  Une table peut etre : une variable, une table écrite en ligne, un produit de deux tables, le résultat d'une commande SELECT.
+  Pour faire le produit de deux tables la syntaxe est "table1 AS tb1 PROD table2 AS tb2". J'ai obligé les "AS" pour pouvoir faire des autoproduits.
+  Un produit avec une clause WHERE de type "tb1.col1=tb2.col2" permet de faire une jointure.
+  Pour écrire une table en ligne la syntaxe est {[col1 col2 col3][Int Str Str][[1 "abc" "def"][2 "ghi" "jkl"]]}
+-INSERT table INTO tablename; insere table dans la table tablename si les structures de tables sont identiques. tablename doit etre une variable, table peut etre n'importe quel type de table décrit comme au dessus.
+-LET tbname = table; charge la table dans la variable tbname.
+
+Les fichiers .dbl montrent des exemples de codes sur les tables .csv

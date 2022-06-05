@@ -1,0 +1,11 @@
+"eleve","matiere","note"
+Int,Str,Int
+1,"math",14
+1,"histoire",15
+1,"physique",15
+2,"math",18
+2,"histoire",10
+2,"physique",8
+3,"math",14
+3,"histoire",14
+3,"physique",6

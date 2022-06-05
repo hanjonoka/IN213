@@ -1,0 +1,6 @@
+OPEN "erreur.csv" AS table;
+OPEN "table1.csv" AS table;
+INSERT {[col1 col2 col3][Str Str Int]["ab" "cd" 1]} INTO table;
+SELECT * FROM table;
+SELECT * FROM table WHERE 2="coucou";
+SELECT * FROM table WHERE col1=5;
