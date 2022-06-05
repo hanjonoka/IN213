@@ -47,11 +47,13 @@ let rec eval e rho =
     | _ -> error ("cannot commit non table")
   )
   | EIdent v -> lookup v rho
-  | ESelect (cols, table_name, where) -> (
-    let table = lookup table_name rho in
+  | ESelect (cols, table_expr, where) -> (
+    let table = eval table_expr rho in
     match table with
     | Tableval tb -> (
-      let indices = List.map (list_find_i tb.header) cols in
+      let indices = (
+        if cols = ["*"] then List.map (list_find_i tb.header) tb.header else List.map (list_find_i tb.header) cols
+      ) in
       let header = List.map (List.nth tb.header) indices in
       let find_inds row = List.map (List.nth row) indices in
       let find_inds_type_to_raw ty = (
@@ -86,6 +88,18 @@ let rec eval e rho =
     )
   | ETable (header, types, body) -> (
     Tableval (get_table header types body)
+  )
+  | EProd (expr1, s1, expr2, s2) -> (
+    match (eval expr1 rho, eval expr2 rho) with 
+    | (Tableval tb1, Tableval tb2) -> (
+      let header = (List.map (string_cat (Printf.sprintf "%s." s1)) tb1.header) @ (List.map (string_cat (Printf.sprintf "%s." s2)) tb2.header) in
+      let types = List.map raw_of_type (tb1.types @ tb2.types) in
+      let cat_line_and_list list1 line =
+        List.map (List.append line) list1 in
+      let body = List.concat( List.map (cat_line_and_list tb2.body) tb1.body ) in
+      Tableval (get_table header types body)
+    )
+    | _ -> error "Can only do products of tables"
   )
   | EInsert (tb1_expr, tb2_i) -> (
     match eval tb1_expr rho with

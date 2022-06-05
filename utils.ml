@@ -9,6 +9,9 @@ type mutable_int_list = {mutable l: int list}
 
 let error msg = raise (Failure msg) ;;
 
+(* Existe dans le module String à partir de Ocaml 4.13*)
+let string_cat s1 s2 = s1 ^ s2;;
+
 (* Existe dans le module List seulement à partir de Ocaml 4.11 et j'ai Ocaml 4.08 *)
 let rec list_filteri f l i =
   match l with

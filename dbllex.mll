@@ -62,7 +62,7 @@ let newline = ('\010' | '\013' | "\013\010")
 rule lex = parse
     (' ' | '\t' | newline)
       { lex lexbuf }
-  | [ 'A'-'Z' 'a'-'z' ] [ 'A'-'Z' 'a'-'z' '1'-'9']* as lxm
+  | [ 'A'-'Z' 'a'-'z' '*'] [ 'A'-'Z' 'a'-'z' '1'-'9' '.']* as lxm
     {match lxm with
       | "OPEN" -> OPEN
       | "COMMIT" -> COMMIT
@@ -75,6 +75,7 @@ rule lex = parse
       | "INTO" -> INTO
       | "AND" -> AND
       | "WHERE" -> WHERE
+      | "PROD" -> PROD
       | _ -> IDENT(lxm) }
   | ";"  {SEMI}
   | '"'   { reset_string_buffer();

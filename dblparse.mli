@@ -21,6 +21,7 @@ type token =
   | INTO
   | WHERE
   | AND
+  | PROD
 
 val main :
   (Lexing.lexbuf  -> token) -> Lexing.lexbuf -> Dblast.expr
