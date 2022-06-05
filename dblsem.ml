@@ -167,7 +167,6 @@ let rec eval e rho =
     )
     | s -> error (Printf.sprintf "unknown op %s" s)
   )
-  | _ -> raise (Failure "à finir")
 ;;
 
 let eval e = eval e init_env ;;

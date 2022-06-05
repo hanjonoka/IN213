@@ -43,6 +43,7 @@ let raw_of_val v =
   match v with
   | Str s -> "\"" ^ s ^ "\""
   | Int i -> Printf.sprintf "%d" i
+  | Null -> "null"
 
 let sprint_val v =
   match v with
@@ -57,7 +58,7 @@ let val_of_raw raw_val =
     try
       Int (int_of_string raw_val)
     with
-    | Failure "int_of_string" -> Null
+    | Failure _ -> Null
 
 let type_of_raw str =
   match str with
@@ -83,7 +84,7 @@ let get_table header types body =
       | Null, _ -> false
       | Int i, Int _ -> false
       | Str s, Str _ -> false
-      | _ -> error "incorrect type"; true
+      | _ -> error "incorrect type"
     ) in
     List.exists2 is_of_wrong_type row types_l
   ) in

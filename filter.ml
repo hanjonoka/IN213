@@ -120,6 +120,7 @@ let rec apply_filter filtre header row =
           | Int i1, Int i2 -> i1<i2
           | _,_ -> error (Printf.sprintf "cannot apply operator < to cols %s and %s" cname1 cname2)
         )
+        | _ -> error (Printf.sprintf "Cannot apply operator < to %s and %s" (sprint_obj obj1) (sprint_obj obj2))
       )
       | _,_ -> error (Printf.sprintf "Cannot apply operator < to %s and %s" (sprint_obj obj1) (sprint_obj obj2))
     )
@@ -140,6 +141,7 @@ let rec apply_filter filtre header row =
           | Int i1, Int i2 -> i1<=i2
           | _,_ -> error (Printf.sprintf "cannot apply operator <= to cols %s and %s" cname1 cname2)
         )
+        | _ -> error (Printf.sprintf "Cannot apply operator <= to %s and %s" (sprint_obj obj1) (sprint_obj obj2))
       )
       | _,_ -> error (Printf.sprintf "Cannot apply operator <= to %s and %s" (sprint_obj obj1) (sprint_obj obj2))
     )
@@ -158,10 +160,11 @@ let rec apply_filter filtre header row =
           let ind2 = list_find_i header cname2 in
           match (List.nth row ind1, List.nth row ind2) with
           | Int i1, Int i2 -> i1>i2
-          | _,_ -> error (Printf.sprintf "cannot apply operator < to cols %s and %s" cname1 cname2)
+          | _,_ -> error (Printf.sprintf "cannot apply operator > to cols %s and %s" cname1 cname2)
         )
+        | _ -> error (Printf.sprintf "Cannot apply operator > to %s and %s" (sprint_obj obj1) (sprint_obj obj2))
       )
-      | _,_ -> error (Printf.sprintf "Cannot apply operator < to %s and %s" (sprint_obj obj1) (sprint_obj obj2))
+      | _,_ -> error (Printf.sprintf "Cannot apply operator > to %s and %s" (sprint_obj obj1) (sprint_obj obj2))
     )
     | Geq -> (
       match obj1, obj2 with
@@ -178,10 +181,10 @@ let rec apply_filter filtre header row =
           let ind2 = list_find_i header cname2 in
           match (List.nth row ind1, List.nth row ind2) with
           | Int i1, Int i2 -> i1>=i2
-          | _,_ -> error (Printf.sprintf "cannot apply operator < to cols %s and %s" cname1 cname2)
+          | _,_ -> error (Printf.sprintf "cannot apply operator >= to cols %s and %s" cname1 cname2)
         )
+        | _ -> error (Printf.sprintf "Cannot apply operator >= to %s and %s" (sprint_obj obj1) (sprint_obj obj2))
       )
-      | _,_ -> error (Printf.sprintf "Cannot apply operator < to %s and %s" (sprint_obj obj1) (sprint_obj obj2))
+      | _,_ -> error (Printf.sprintf "Cannot apply operator >= to %s and %s" (sprint_obj obj1) (sprint_obj obj2))
     )
-    | s -> error (Printf.sprintf "opérateurs à finir")
   )
