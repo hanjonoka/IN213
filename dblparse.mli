@@ -3,6 +3,12 @@ type token =
   | INT of (int)
   | STRING of (string)
   | EQUAL
+  | LT
+  | LEQ
+  | GT
+  | GEQ
+  | NEQ
+  | FILTRE_OP of (string)
   | SEMI
   | LPAR
   | RPAR
@@ -20,7 +26,6 @@ type token =
   | INSERT
   | INTO
   | WHERE
-  | AND
   | PROD
 
 val main :

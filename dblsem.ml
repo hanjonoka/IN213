@@ -1,8 +1,10 @@
 open Dblast;;
 open Utils;;
+open Filter;;
 
 type dblval =
   | Tableval of table
+  | Filtreval of filtre
   | Void
 
 and environment = (string * dblval) list
@@ -28,6 +30,7 @@ let lookup var_name rho =
 let rec printval = function
   | Tableval tb -> Csv.print_table stdout tb
   | Void -> Printf.printf ""
+  | Filtreval f -> Printf.printf "FILTRE"
 ;;
 
 
@@ -47,7 +50,7 @@ let rec eval e rho =
     | _ -> error ("cannot commit non table")
   )
   | EIdent v -> lookup v rho
-  | ESelect (cols, table_expr, where) -> (
+  | ESelect (cols, table_expr, filtre_expr) -> (
     let table = eval table_expr rho in
     match table with
     | Tableval tb -> (
@@ -60,23 +63,12 @@ let rec eval e rho =
         let nth_to_raw l i = raw_of_type (List.nth l i) in
         List.map (nth_to_raw ty) indices
       ) in
-      let rec compute_filter where head =
-        match where with
-        | (s,v)::rem -> (
-          ((list_find_i head s),v) :: (compute_filter rem head)
-        )
-        | _ -> []
+      let filtre =
+        match eval filtre_expr rho with
+        | Filtreval f -> f
+        | _ -> error "cannot apply not filter"
       in
-      let filter = compute_filter where tb.header in
-      let rec apply_where filter row = (
-        match filter with
-        | (i, v) :: rem -> (
-          if (List.nth row i)=v then (true && (apply_where rem row)) else false
-        )
-        | _ -> true
-      )
-      in
-      Tableval (get_table header (find_inds_type_to_raw tb.types) (List.map (find_inds) (List.filter (apply_where filter) tb.body)))
+      Tableval (get_table header (find_inds_type_to_raw tb.types) (List.map (find_inds) (List.filter (apply_filter filtre header) tb.body)))
     )
     | _ -> error ("Can only select from a table")
   )
@@ -114,6 +106,66 @@ let rec eval e rho =
       | _ -> error "Cannot insert into non-table"
     )
     | _ -> error "Cannot insert non-table"
+  )
+  | EFiltre (ef1,op,ef2) -> (
+    match ef1, ef2 with
+    | EFiltre _, EFiltre _ | EFiltre _, ECond _ | ECond _, EFiltre _ | ECond _, ECond _ -> (
+      match op with
+      | "AND" -> (
+        match (eval ef1 rho,eval ef2 rho) with
+        | Filtreval f1, Filtreval f2 -> Filtreval (Sup_filtre (f1,AND_op,f2))
+        | _ -> error "sill not filters ???"
+      )
+      | "OR" -> (
+        match (eval ef1 rho,eval ef2 rho) with
+        | Filtreval f1, Filtreval f2 -> Filtreval (Sup_filtre (f1,OR_op,f2))
+        | _ -> error "sill not filters ???"
+      )
+      | s -> error (Printf.sprintf "unknown operator %s" s)
+    )
+    | _,_ -> error "Where condition must be a filter"
+  )
+  | ECond (obj1, op, obj2) -> (
+    match op with
+    | "=" -> (
+      match (obj1, obj2) with
+      | Filtre_col _, _ -> Filtreval (Condition(obj1, Eq, obj2))
+      | Filtre_val (Int _), Filtre_val (Int _) -> Filtreval (Condition(obj1, Eq, obj2))
+      | Filtre_val (Str _), Filtre_val (Str _) -> Filtreval (Condition(obj1, Eq, obj2))
+      | _,_ -> error (Printf.sprintf "Cannot apply operator %s on these operands" op)
+    )
+    | "!=" -> (
+      match (obj1, obj2) with
+      | Filtre_col _, _ -> Filtreval (Condition(obj1, Neq, obj2))
+      | Filtre_val (Int _), Filtre_val (Int _) -> Filtreval (Condition(obj1, Neq, obj2))
+      | Filtre_val (Str _), Filtre_val (Str _) -> Filtreval (Condition(obj1, Neq, obj2))
+      | _,_ -> error (Printf.sprintf "Cannot apply operator %s on these operands" op)
+    )
+    | "<" -> (
+      match (obj1, obj2) with
+      | Filtre_col _, _ -> Filtreval (Condition(obj1, Lt, obj2))
+      | Filtre_val (Int _), Filtre_val (Int _) -> Filtreval (Condition(obj1, Lt, obj2))
+      | _,_ -> error (Printf.sprintf "Cannot apply operator %s on these operands" op)
+    )
+    | "<=" -> (
+      match (obj1, obj2) with
+      | Filtre_col _, _ -> Filtreval (Condition(obj1, Leq, obj2))
+      | Filtre_val (Int _), Filtre_val (Int _) -> Filtreval (Condition(obj1, Leq, obj2))
+      | _,_ -> error (Printf.sprintf "Cannot apply operator %s on these operands" op)
+    )
+    | ">=" -> (
+      match (obj1, obj2) with
+      | Filtre_col _, _ -> Filtreval (Condition(obj1, Geq, obj2))
+      | Filtre_val (Int _), Filtre_val (Int _) -> Filtreval (Condition(obj1, Geq, obj2))
+      | _,_ -> error (Printf.sprintf "Cannot apply operator %s on these operands" op)
+    )
+    | ">" -> (
+      match (obj1, obj2) with
+      | Filtre_col _, _ -> Filtreval (Condition(obj1, Gt, obj2))
+      | Filtre_val (Int _), Filtre_val (Int _) -> Filtreval (Condition(obj1, Gt, obj2))
+      | _,_ -> error (Printf.sprintf "Cannot apply operator %s on these operands" op)
+    )
+    | s -> error (Printf.sprintf "unknown op %s" s)
   )
   | _ -> raise (Failure "à finir")
 ;;

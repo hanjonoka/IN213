@@ -5,9 +5,10 @@ open Dblast ;;
 %token <string> IDENT
 %token <int> INT
 %token <string> STRING
-%token EQUAL
+%token EQUAL LT LEQ GT GEQ NEQ
+%token <string> FILTRE_OP
 %token SEMI LPAR RPAR LCURL RCURL LBRAC RBRAC
-%token OPEN COMMIT AS TO SELECT FROM LET INSERT INTO WHERE AND PROD
+%token OPEN COMMIT AS TO SELECT FROM LET INSERT INTO WHERE PROD
 
 %start main
 %type <Dblast.expr> main
@@ -41,11 +42,17 @@ table_expr :
 ;
 
 where :
-  WHERE IDENT EQUAL value seqfilter {($2,$4)::$5}
-|                                   {[]}
-seqfilter :
-  AND IDENT EQUAL value seqfilter {($2,$4)::$5}
-|                                 {[]}
+| WHERE filter_expr {$2}
+|                   {ECond(Filtre_val (Int 1), "=", Filtre_val (Int 1))}
+
+filter_expr :
+| LPAR filter_expr RPAR             { $2 }
+| filter_expr FILTRE_OP filter_expr { EFiltre($1,$2,$3) }
+| filter_obj op filter_obj          { ECond($1,$2,$3) }
+
+filter_obj :
+| IDENT {Filtre_col ($1)} //nom de colonne
+| value {Filtre_val ($1)}
 
 row_vals :
   LBRAC value seqvalue RBRAC row_vals {($2 :: $3) :: $5}
@@ -68,3 +75,11 @@ seqvalue:
 atom:
   IDENT          { EIdent($1)}
 ;
+
+op :
+| EQUAL {"="}
+| LT    {"<"}
+| LEQ   {"<="}
+| GT    {">"}
+| GEQ   {">="}
+| NEQ   {"!="}

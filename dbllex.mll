@@ -73,9 +73,10 @@ rule lex = parse
       | "FROM" -> FROM
       | "INSERT" -> INSERT
       | "INTO" -> INTO
-      | "AND" -> AND
       | "WHERE" -> WHERE
       | "PROD" -> PROD
+      | "AND" -> FILTRE_OP(lxm)
+      | "OR" -> FILTRE_OP(lxm)
       | _ -> IDENT(lxm) }
   | ";"  {SEMI}
   | '"'   { reset_string_buffer();
@@ -89,6 +90,11 @@ rule lex = parse
   | "[" {LBRAC}
   | "]" {RBRAC}
   | "=" {EQUAL}
+  | "<" {LT}
+  | "<=" {LEQ}
+  | ">" {GT}
+  | ">=" {GEQ}
+  | "!=" {NEQ}
   | eof {raise Eoi}
   | _  as c { Printf.eprintf "Invalid char `%c'\n%!" c ; lex lexbuf }
 
